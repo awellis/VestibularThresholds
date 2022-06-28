@@ -61,19 +61,9 @@ simulate(params::MixtureModelParams,
                 nreps=nreps, noise=noise)
 
 
-
-m1 = MixtureModelParams()
-m2 = PsychophysicsModelParams()
-
-stimulus_levels = range(-1, 1, length = 5)
-d1 = simulate(m1, stimulus_levels, nreps=200)
-d2 = simulate(m2, stimulus_levels, nreps=200)
-
 function fit_model(model::Function, d::DataFrame; alg=NUTS())
 	m = model(d.x, d.y)
 	alg = NUTS()
 	fit = Turing.sample(m, alg, MCMCThreads(), 1000, 4)
 end
 
-
-fit = fit_model(mixture_model, d1)
