@@ -11,6 +11,7 @@ export ModelParams
 export MixtureModelParams, PsychophysicsModelParams
 export bernoulli_mixture, simulate
 export mixture_model, psychophysics_model, logistic_regression
+export fit_model
 
 include("utils.jl")
 include("generate-data.jl")
