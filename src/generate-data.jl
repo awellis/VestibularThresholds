@@ -27,6 +27,12 @@ function bernoulli_mixture(θ, γ, linpred::Vector{Float64})
     θ * γ .+ (1-θ) .* logistic.(linpred)
 end
 
+function wichmann_hill(λ, γ, linpred::Vector{Float64}) 
+	@assert 0 < λ < 1
+	@assert 0 < γ < 1
+	γ .+ (1-γ-λ) .* logistic.(linpred)
+end
+
 function simulate(params::MixtureModelParams,
                 stimulus_levels::Vector{Float64}; 
                 nreps::Int64=10, noise::Bool=false)
@@ -53,3 +59,21 @@ simulate(params::MixtureModelParams,
 	stimulus_levels::StepRangeLen{Float64, Base.TwicePrecision{Float64}, Base.TwicePrecision{Float64}, Int64}; 
                 nreps::Int64=10, noise::Bool=false) = simulate(params, collect(stimulus_levels); 
                 nreps=nreps, noise=noise)
+
+
+
+m1 = MixtureModelParams()
+m2 = PsychophysicsModelParams()
+
+stimulus_levels = range(-1, 1, length = 5)
+d1 = simulate(m1, stimulus_levels, nreps=200)
+d2 = simulate(m2, stimulus_levels, nreps=200)
+
+function fit_model(model::Function, d::DataFrame; alg=NUTS())
+	m = model(d.x, d.y)
+	alg = NUTS()
+	fit = Turing.sample(m, alg, MCMCThreads(), 1000, 4)
+end
+
+
+fit = fit_model(mixture_model, d1)
